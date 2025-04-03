@@ -3,9 +3,9 @@
 
 
 
-DROP DATABASE IF EXISTS SimpleLibraryDB;
-CREATE DATABASE SimpleLibraryDB;
-USE SimpleLibraryDB;
+DROP DATABASE IF EXISTS LbraryDB;
+CREATE DATABASE LibraryDB;
+USE LibraryDB;
 
 -- 1. Basic Tables
 CREATE TABLE Authors (
