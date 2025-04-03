@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Records System</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+        }
+
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-buttons {
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #cancel-btn {
+            background-color: #e74c3c;
+        }
+
+        #cancel-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .records-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        #search {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #d35400;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Patient Records System</h1>
+        
+        <div class="form-container">
+            <h2 id="form-title">Add New Patient</h2>
+            <form id="patient-form">
+                <input type="hidden" id="patient-id">
+                
+                <div class="form-group">
+                    <label for="name">Full Name:</label>
+                    <input type="text" id="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="condition">Medical Condition:</label>
+                    <input type="text" id="condition" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone">
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" id="submit-btn">Add Patient</button>
+                    <button type="button" id="cancel-btn" style="display: none;">Cancel</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="records-container">
+            <h2>Patient Records</h2>
+            <div class="search-container">
+                <input type="text" id="search" placeholder="Search patients...">
+            </div>
+            <table id="patient-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Condition</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="patient-list">
+    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+       
+        let patients = [];
+        let currentPatientId = null;
+
+    
+        const patientForm = document.getElementById('patient-form');
+        const patientList = document.getElementById('patient-list');
+        const searchInput = document.getElementById('search');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+
+       // Form submit handling
+        patientForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+           
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            const condition = document.getElementById('condition').value;
+            const phone = document.getElementById('phone').value;
+            
+            if (currentPatientId ==! null && currentPatientId !== undefined) {
+                // Update existing patient
+              
+                const patientIndex = patients.findIndex(function(p) {
+                    return p.id === currentPatientID;
+
+                });
+
+                if (patientIndex !== -1) {
+                    patients[patientIndex] = {
+                        id: currentPatientId,
+                        name,
+                        age,
+                        gender,
+                        condition,
+                        phone
+                    };
+                }
+            } else {
+                //add new patient
+                const newPatient = {
+                    id: Date.now().toString(),
+                    name,
+                    age,
+                    gender,
+                    condition,
+                    phone
+                };
+                patients.push(newPatient);
+            }
+            
+           
+            resetForm();
+            renderPatientList();
+        });
+
+       
+        cancelBtn.addEventListener('click', resetForm);
+
+     
+        searchInput.addEventListener('input', function() {
+            renderPatientList();
+        });
+
+      // 1. Get search term and convert to lowercase for case-insensitive search
+        function renderPatientList() {
+            const searchTerm = searchInput.value.toLowerCase();
+            // 2. Filter patients based on search term
+            const filteredPatients = patients.filter(patient => 
+                patient.name.toLowerCase().includes(searchTerm) ||
+                patient.condition.toLowerCase().includes(searchTerm) ||
+                patient.phone.includes(searchTerm)
+            );
+             // 3. Clear the current patient list
+            patientList.innerHTML = '';
+          
+            // 4. Show message if no patients found
+            if (filteredPatients.length === 0) {
+                patientList.innerHTML = '<tr><td colspan="6">No patients found</td></tr>';
+                return;
+            }
+            
+            // 5. Create and display each patient row
+            filteredPatients.forEach(patient => {
+                const row = document.createElement('tr');
+                
+                // 5a. Create the HTML for this patient's row
+
+                row.innerHTML = `
+                    <td>${patient.name}</td>
+                    <td>${patient.age}</td>
+                    <td>${patient.gender}</td>
+                    <td>${patient.condition}</td>
+                    <td>${patiwent.phone || 'N/A'}</td>
+                    <td>
+                        <button class="action-btn edit-btn" data-id="${patient.id}">Edit</button>
+                        <button class="action-btn delete-btn" data-id="${patient.id}">Delete</button>
+                    </td>
+                `;
+                
+                 // 5b. Add the row to the table
+                patientList.appendChild(row);
+            });
+            
+            // 6. Add event listeners to all edit buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', handleEdit);
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', handleDelete);
+            });
+        }
+
+        
+        function handleEdit(editButton) {
+    // Get patient ID from the button's data attribute
+    const patientId = editButton.dataset.id;
+    
+    // Find the patient in our array
+    for (let i = 0; i < patients.length; i++) {
+        if (patients[i].id === patientId) {
+            const patient = patients[i];
+            
+            // Fill the form with patient data
+            nameInput.value = patient.name;
+            ageInput.value = patient.age;
+            genderInput.value = patient.gender;
+            conditionInput.value = patient.condition;
+            phoneInput.value = patient.phone || '';
+            
+            // Update UI for editing
+            formTitle.textContent = 'Edit Patient';
+            submitBtn.textContent = 'Update';
+            cancelBtn.style.display = 'inline';
+            currentPatientId = patientId;
+            
+            break; // Stop searching after we find the patient
+        }
+    }
+}
+            if (patient) {
+                currentPatientId = patient.id;
+                document.getElementById('name').value = patient.name;
+                document.getElementById('age').value = patient.age;
+                document.getElementById('gender').value = patient.gender;
+                document.getElementById('condition').value = patient.condition;
+                document.getElementById('phone').value = patient.phone || '';
+                
+                formTitle.textContent = 'Edit Patient';
+                submitBtn.textContent = 'Update Patient';
+                cancelBtn.style.display = 'inline-block';
+            }
+        
+
+       
+        function Delete(e) {
+            if (confirm('Are you sure you want to delete this patient record?')) {
+                const patientId = e.target.getAttribute('data-id');
+                patients = patients.filter(function(patient) {
+                    return patient.id !== patientID;
+                
+            });
+                
+                if (currentPatientId === patientId) {
+                    resetForm();
+                }
+                
+                renderPatientList();
+            }
+        }
+
+        
+        function resetForm() {
+            patientForm.reset();
+            currentPatientId = null;
+            formTitle.textContent = 'Add New Patient';
+            submitBtn.textContent = 'Add Patient';
+            cancelBtn.style.display = 'none';
+        }
+
+        
+        function init() {        
+            renderPatientList();
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>
