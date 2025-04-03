@@ -70,21 +70,21 @@ JOIN Authors a ON b.author_id = a.author_id
 WHERE b.available = TRUE;
 
 -- Find books by specific author
-SELECT title FROM Books WHERE author_id = 1;
+--SELECT title FROM Books WHERE author_id = 1;
 
 -- UPDATE (Modify existing data)
 -- Mark a book as unavailable
-UPDATE Books SET available = FALSE WHERE book_id = 1;
+--UPDATE Books SET available = FALSE WHERE book_id = 1;
 
 -- Update borrower email
-UPDATE Borrowers SET email = 'new.email@example.com' WHERE borrower_id = 1;
+--UPDATE Borrowers SET email = 'new.email@example.com' WHERE borrower_id = 1;
 
 -- DELETE (Remove records)
 -- Remove a borrower
-DELETE FROM Borrowers WHERE borrower_id = 3;
+-- DELETE FROM Borrowers WHERE borrower_id = 3;
 
 -- Remove a book (only if not referenced elsewhere)
-DELETE FROM Books WHERE book_id = 4;
+-- DELETE FROM Books WHERE book_id = 4;
 
 -- 5. BORROW BOOK FUNCTIONALITY
 
@@ -136,18 +136,18 @@ END //
 DELIMITER ;
 
 -- Test the borrow function
-CALL BorrowBook(1, 1);  -- Should succeed
-CALL BorrowBook(1, 2);  -- Should fail (book already borrowed)
+--CALL BorrowBook(1, 1);  -- Should succeed
+--CALL BorrowBook(1, 2);  -- Should fail (book already borrowed)
 
 -- View current loans
-SELECT b.title, br.name, l.loan_date 
-FROM Loans l
-JOIN Books b ON l.book_id = b.book_id
-JOIN Borrowers br ON l.borrower_id = br.borrower_id
-WHERE l.returned = FALSE;
+--SELECT b.title, br.name, l.loan_date 
+--FROM Loans l
+--JOIN Books b ON l.book_id = b.book_id
+--JOIN Borrowers br ON l.borrower_id = br.borrower_id
+-- WHERE l.returned = FALSE;
 
 -- Test the return function
-CALL ReturnBook(1);  -- Return the first loan
+--CALL ReturnBook(1);  -- Return the first loan
 
 -- Verify book is available again
-SELECT title, available FROM Books WHERE book_id = 1;
+--SELECT title, available FROM Books WHERE book_id = 1;
